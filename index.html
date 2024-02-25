@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <script src="https://kit.fontawesome.com/687ba78eae.js" crossorigin="anonymous"></script>
+
+  <title>Document</title>
+  <style>
+    .class {
+      background-image: url("https://images.unsplash.com/32/Mc8kW4x9Q3aRR3RkP5Im_IMG_4417.jpg?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YmFja2dyb3VuZCUyMGltYWdlc3xlbnwwfHwwfHx8MA%3D%3D");
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    h1 {
+      color: white;
+    }
+
+    .table-container {
+      max-height: 40vh;
+      background-color: white;
+      overflow: auto;
+      width: 100%;
+      /* Ensure the table container takes the full width */
+    }
+
+    #myname {
+      height: 6vh;
+      width: 50%;
+      border: none;
+      border-radius: 5px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .mainInput {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      width: 50vw;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="class">
+    <h1>
+      TO-DO List
+
+    </h1>
+    <div class="main">
+      <div id="main">
+        <div id="mainInput">
+          <input id="myname" type="text" placeholder="Enter Your Name">
+          <button type="button" class="btn btn-primary" onclick="handleSubmit()" id="mainbutton">
+            <i class="fa-solid fa-pen-to-square"></i>Submit</button>
+          <button id="change" onclick="change()" type="button" class="btn btn-success">Change</button>
+        </div>
+        <div class="table-container">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Task</th>
+                <th scope="col">Date</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tbshow">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let disp = document.getElementById("tbshow")
+
+    //delete elements
+
+    function del(i) {
+      console.log(i, "del");
+      let data = JSON.parse(localStorage.getItem("data"))
+      data.splice(i, 1)
+      localStorage.setItem("data", JSON.stringify(data))
+      displayTasks()
+    }
+
+    function shiftUp(i) {
+      console.log(i, "up");
+      if (i == 0) {
+        alert("already on top")
+      }
+      else {
+        let data = JSON.parse(localStorage.getItem("data"))
+        let hold = data[i]
+        data[i] = data[i - 1]
+        data[i - 1] = hold
+        localStorage.setItem("data", JSON.stringify(data))
+      }
+
+      displayTasks()
+    }
+    var changee = document.getElementById("change")
+    var submit = document.getElementById("mainbutton")
+    var inp = document.getElementById("myname")
+    let z
+
+    function shiftDown(i) {
+      console.log(i, "down");
+      let data = JSON.parse(localStorage.getItem("data"));
+      if (i == data.length - 1) {
+        alert("this is already on bottom");
+      }
+      else {
+        let moveUp = data[i];
+        data[i] = data[i + 1];
+        data[i + 1] = moveUp;
+        localStorage.setItem("data", JSON.stringify(data));
+      }
+      displayTasks()
+    }
+
+
+    //step02 display task
+    function displayTasks() {
+      let data = JSON.parse(localStorage.getItem("data"))
+      disp.innerHTML = ""
+      data.map((ele, i) => {
+        disp.innerHTML += `
+<tr>
+      <th scope="row">${i+1} :</th>
+      <td>${ele}</td>
+      <td>date</td>
+      <td>
+        <button type="button" class="btn btn-success" onclick="edit(${i})">Edit
+          <i class="fa-solid fa-pen-to-square"></i></button>
+        <button type="button" onclick="del(${i})" class="btn btn-danger">Del
+          <i class="fa-solid fa-trash"></i></button>
+        <button type="button" onclick="shiftUp(${i})" class="btn btn-primary">Up
+          <i class="fa-solid fa-circle-up"></i></button>
+        <button type="button" onclick="shiftDown(${i})" class="btn btn-dark">Down
+          <i class="fa-solid fa-circle-down"></i></button>
+        </td>
+    </tr>
+`
+      })
+    }
+
+    //step01 add task 
+    const handleSubmit = () => {
+      let task = document.querySelector("input").value
+
+      console.log(task);
+      let data = JSON.parse(localStorage.getItem("data"))
+      if (!data) {
+        localStorage.setItem("data", JSON.stringify([task]))
+      }
+      else {
+        data.push(task)
+        localStorage.setItem("data", JSON.stringify(data))
+
+      }
+      displayTasks()
+      document.querySelector("input").value = ""
+    }
+
+    function edit(i) {
+      console.log(i, "edit")
+      let data = JSON.parse(localStorage.getItem("data"))
+      inp.value = data[i]
+      z = i;
+      inp.focus()
+      localStorage.setItem("data", JSON.stringify(data))
+      changee.style.display = "inline-block"
+      submit.style.display = "none"
+      displayTasks()
+    }
+    function change() {
+      let data = JSON.parse(localStorage.getItem("data"))
+      data[z] = inp.value
+      changee.style.display = "none"
+      submit.style.display = "inline-block"
+      localStorage.setItem("data", JSON.stringify(data))
+      displayTasks()
+    }
+
+    displayTasks()
+  </script>
+</body>
+
+</html>
